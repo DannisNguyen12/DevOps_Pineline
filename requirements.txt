@@ -1,0 +1,10 @@
+# DevOps Pipeline - Requirements
+# This file specifies the Python dependencies for the project
+
+# No external dependencies needed for the basic calculator
+# Using only Python standard library modules
+
+# For development and testing (optional):
+# pytest>=7.0.0
+# coverage>=6.0
+# flake8>=4.0.0
