@@ -1,0 +1,70 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      # Upgrade pip to latest version
+      - pip install --upgrade pip
+
+      # Install project dependencies if requirements.txt exists
+      - |
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt
+        fi
+
+      # Install testing dependencies
+      - pip install pytest pytest-cov
+
+  pre_build:
+    commands:
+      # Validate Python syntax
+      - echo "Validating Python syntax..."
+      - python -m py_compile hello.py test.py
+
+      # Check if all imports work
+      - echo "Checking imports..."
+      - python -c "import hello; print('All imports successful')"
+
+  build:
+    commands:
+      # Run tests
+      - echo "Running tests..."
+      - python -m pytest test.py -v --tb=short
+
+      # Run tests with coverage (optional)
+      - |
+        echo "Running tests with coverage..."
+        python -m pytest test.py --cov=hello --cov-report=term --cov-report=xml --cov-fail-under=80
+
+      # Additional build steps can be added here
+      - echo "Build phase completed successfully"
+
+  post_build:
+    commands:
+      # Generate test reports or artifacts
+      - echo "Generating build artifacts..."
+
+      # Create a simple build artifact (optional)
+      - |
+        if [ -f coverage.xml ]; then
+          echo "Coverage report generated"
+        fi
+
+      # Final status
+      - echo "Build completed successfully!"
+
+artifacts:
+  files:
+    # Include test results and coverage reports
+    - coverage.xml
+    - test.py
+    - hello.py
+  discard-paths: no
+
+cache:
+  paths:
+    # Cache pip dependencies for faster builds
+    - ~/.cache/pip
+    - /root/.cache/pip
