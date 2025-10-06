@@ -3,3 +3,5 @@ def hello_world():
 
 def hello_there(name):
     return f"Hello, {name}!"
+def add(a, b):
+    return a + b
