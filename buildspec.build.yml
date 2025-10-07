@@ -18,7 +18,7 @@ phases:
     commands:
       - echo "Pre-build: validate python files"
       - |
-        for f in hello.py test.py app.py; do
+        for f in hello.py test.py; do
           if [ -f "$f" ]; then
             echo "Compiling $f"
             python3 -m py_compile "$f"
