@@ -1,0 +1,49 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - pip install --upgrade pip
+      - |
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt
+        fi
+      - pip install pytest pytest-cov
+      - npm install -g aws-cdk
+
+  pre_build:
+    commands:
+      - echo "Validate syntax"
+      - |
+        for f in hello.py test.py; do
+          if [ -f "$f" ]; then
+            echo "Compiling $f"
+            python -m py_compile "$f"
+          else
+            echo "Skipping $f (not found)"
+          fi
+        done
+
+  build:
+    commands:
+      - echo "Running tests..."
+      - python -m pytest -q --junitxml=pytest-results.xml || exit 1
+      - echo "Running cdk synth..."
+      - |
+        if command -v cdk >/dev/null 2>&1; then
+          cdk synth --quiet
+        else
+          echo "cdk CLI not found; skipping synth"
+        fi
+
+artifacts:
+  files:
+    - 'cdk.out/**'
+    - 'pytest-results.xml'
+  base-directory: .
+  discard-paths: no
+
+cache:
+  paths:
+    - ~/.cache/pip
