@@ -16,7 +16,7 @@ phases:
 
   pre_build:
     commands:
-      - echo "Pre-build: validate python files"
+    - echo "Prebuild system and Python dependencies..."
       - |
         for f in hello.py test.py; do
           if [ -f "$f" ]; then
