@@ -1,0 +1,54 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo "Installing system and Python dependencies..."
+      - python3 -m pip install --upgrade pip
+      - |
+        if [ -f requirements.txt ]; then
+          python3 -m pip install -r requirements.txt
+        else
+          python3 -m pip install pytest pytest-cov
+        fi
+
+  pre_build:
+    commands:
+      - echo "Pre-build: validate python files"
+      - |
+        for f in hello.py test.py app.py; do
+          if [ -f "$f" ]; then
+            echo "Compiling $f"
+            python3 -m py_compile "$f"
+          fi
+        done
+
+  build:
+    commands:
+      - echo "Running tests with coverage and producing junit xml"
+      - python3 -m pytest -q --junitxml=pytest-results.xml --cov=hello --cov-report=xml --cov-fail-under=0 || TEST_EXIT=$?
+      - |
+        if [ -z "$TEST_EXIT" ]; then
+          echo "Tests passed (or pytest returned 0)"
+        else
+          echo "Tests failed with exit code $TEST_EXIT"; exit $TEST_EXIT
+        fi
+
+  post_build:
+    commands:
+      - echo "Post-build: list workspace and artifacts"
+      - ls -la
+      - if [ -f pytest-results.xml ]; then echo "JUnit report found"; fi
+      - if [ -f coverage.xml ]; then echo "Coverage report found"; fi
+
+artifacts:
+  files:
+    - pytest-results.xml
+    - coverage.xml
+  discard-paths: no
+
+cache:
+  paths:
+    - ~/.cache/pip
