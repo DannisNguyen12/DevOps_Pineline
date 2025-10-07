@@ -38,7 +38,7 @@ phases:
 
   post_build:
     commands:
-      - echo "Post-build: list workspace and artifacts"
+      - echo "list workspace and artifacts"
       - ls -la
       - if [ -f pytest-results.xml ]; then echo "JUnit report found"; fi
       - if [ -f coverage.xml ]; then echo "Coverage report found"; fi
